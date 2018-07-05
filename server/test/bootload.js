@@ -1,9 +1,17 @@
 const supertest = require('supertest')
 
 const app = require('../src/app')
-const utils = require('../src/lib/utils')
+const model = require('../src/model')
+const { version } = require('../package.json')
 
-before(async () => {
-  await utils.sleep(1500)
+before(async function () {
+  this.timeout(15000)
+
+  // 迁移数据库
+  await model.migrate(version)
+
+  // 初始化数据库
+  await model.init(version)
+
   global.request = supertest(app.listen())
 })
